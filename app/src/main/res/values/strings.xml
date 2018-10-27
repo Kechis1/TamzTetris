@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Tetris</string>
+    <string name="main_menu_title">Tetris</string>
+    <string name="main_menu_play">Tap to play</string>
+    <string name="main_menu_icon_volume_up">volume-up</string>
+    <string name="main_menu_icon_cog">cog</string>
+    <string name="main_menu_icon_medal">medal</string>
+    <string name="main_menu_icon_sign_out">sign-out-alt</string>
 </resources>
