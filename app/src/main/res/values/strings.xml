@@ -5,5 +5,4 @@
     <string name="main_menu_icon_volume_up">volume-up</string>
     <string name="main_menu_icon_cog">cog</string>
     <string name="main_menu_icon_medal">medal</string>
-    <string name="main_menu_icon_sign_out">sign-out-alt</string>
 </resources>

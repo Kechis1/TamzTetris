@@ -73,11 +73,10 @@
         android:layout_marginBottom="8dp"
         android:fontFamily="@font/fontawesome"
         android:text="@string/main_menu_icon_cog"
+        android:textColor="@color/colorTextGrey"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:textColor="@color/colorTextGrey"
-        app:layout_constraintHorizontal_bias="0.308"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvPlay"
         app:layout_constraintVertical_bias="1.0" />
@@ -95,25 +94,8 @@
         android:textColor="@color/colorTextGrey"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/tvExit"
-        app:layout_constraintHorizontal_bias="0.346"
-        app:layout_constraintStart_toEndOf="@+id/tvCog"
-        app:layout_constraintTop_toBottomOf="@+id/tvPlay"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <TextView
-        android:id="@+id/tvExit"
-        android:layout_width="60dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:fontFamily="@font/fontawesome"
-        android:text="@string/main_menu_icon_sign_out"
-        android:textSize="30sp"
-        android:textColor="@color/colorTextGrey"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tvCog"
         app:layout_constraintTop_toBottomOf="@+id/tvPlay"
         app:layout_constraintVertical_bias="1.0" />
 
