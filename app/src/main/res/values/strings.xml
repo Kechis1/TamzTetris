@@ -2,7 +2,11 @@
     <string name="app_name">Tetris</string>
     <string name="main_menu_title">Tetris</string>
     <string name="main_menu_play">Tap to play</string>
-    <string name="main_menu_icon_volume_up">volume-up</string>
-    <string name="main_menu_icon_cog">cog</string>
-    <string name="main_menu_icon_medal">medal</string>
+    <string name="icon_volume_up">&#xf028;</string>
+    <string name="icon_cog">&#xf013;</string>
+    <string name="icon_medal">&#xf5a2;</string>
+    <string name="score">SCORE</string>
+    <string name="level">LEVEL</string>
+    <string name="icon_pause">&#xf04c;</string>
+    <string name="next">NEXT</string>
 </resources>
