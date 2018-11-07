@@ -6,8 +6,7 @@ public abstract class Tetromino {
     protected List<Pos> pos;
     protected int color;
 
-    public Tetromino(List<Pos> pos, int color) {
-        this.pos = pos;
+    public Tetromino(int color) {
         this.color = color;
     }
 
@@ -27,6 +26,13 @@ public abstract class Tetromino {
         this.color = color;
     }
 
+    public void fall() {
+        for (Pos position : pos) {
+            position.setX(position.getX()+1);
+        }
+    }
+
     public abstract void slideRight();
     public abstract void slideLeft();
+    public abstract void setStartPosition(int numColumns, int numRows);
 }

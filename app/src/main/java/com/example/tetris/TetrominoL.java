@@ -5,10 +5,10 @@ import android.graphics.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TetrominoO extends Tetromino {
-    private static final int COLOR = Color.YELLOW;
+public class TetrominoL extends Tetromino {
+    private static final int COLOR = Color.parseColor("#FFA500");
 
-    public TetrominoO() {
+    public TetrominoL() {
         super(COLOR);
     }
 
@@ -24,15 +24,14 @@ public class TetrominoO extends Tetromino {
 
     @Override
     public void setStartPosition(int numColumns, int numRows) {
-        int startPositionX = 0;
+        int startPositionX = 1;
         int startPositionY = numColumns/2-1;
         List<Pos> posList = new ArrayList<Pos>() {};
         posList.add(new Pos(startPositionX, startPositionY));
+        posList.add(new Pos(startPositionX, startPositionY-1));
         posList.add(new Pos(startPositionX, startPositionY+1));
-        posList.add(new Pos(startPositionX+1, startPositionY));
-        posList.add(new Pos(startPositionX+1, startPositionY+1));
+        posList.add(new Pos(startPositionX-1, startPositionY+1));
 
         setPos(posList);
     }
-
 }

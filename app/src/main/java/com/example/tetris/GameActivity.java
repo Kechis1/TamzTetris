@@ -25,13 +25,13 @@ public class GameActivity extends Activity {
     private static final int NUM_COLUMNS = 10;
     private static final int BOARD_HEIGHT = 480;
     private static final int BOARD_WIDTH = 280;
-    private static final int START_POS_X = 0;
-    private static final int START_POS_Y = NUM_COLUMNS/2-1;
     private static final float CELL_WIDTH = BOARD_WIDTH/NUM_COLUMNS;
     private static final float CELL_HEIGHT = BOARD_HEIGHT/NUM_ROWS;
+    private static final int SPEED = 600;
 
     private List<Tetromino> tetrominos;
 
+    Handler handler;
     Bitmap bitmap;
     Canvas canvas;
     Paint paint;
@@ -48,23 +48,38 @@ public class GameActivity extends Activity {
         bitmap = Bitmap.createBitmap(BOARD_WIDTH, BOARD_HEIGHT, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         paint = new Paint();
-        linearLayout.setBackground(new BitmapDrawable(getApplicationContext().getResources(), bitmap));
         linearLayout.bringToFront();
-        paint.setColor(Color.parseColor(GameActivity.COLOR_GRID_BACKGROUND));
-        canvas.drawRect(0,0, BOARD_WIDTH, BOARD_HEIGHT, paint);
-
 
         tetrominos = new ArrayList<Tetromino>(){};
-        List<Pos> posList = new ArrayList<Pos>() {};
-        posList.add(new Pos(START_POS_X, START_POS_Y));
-        posList.add(new Pos(START_POS_X, START_POS_Y+1));
-        posList.add(new Pos(START_POS_X+1, START_POS_Y));
-        posList.add(new Pos(START_POS_X+1, START_POS_Y+1));
+        TetrominoI tI = new TetrominoI();
+        TetrominoJ tJ = new TetrominoJ();
+        TetrominoL tL = new TetrominoL();
+        TetrominoO tO = new TetrominoO();
+        TetrominoS tS = new TetrominoS();
+        TetrominoT tT = new TetrominoT();
+        TetrominoZ tZ = new TetrominoZ();
 
-        tetrominos.add(new TetrominoO(posList));
+        tI.setStartPosition(NUM_COLUMNS, NUM_ROWS);
+        tetrominos.add(tI);
 
-        paintTetrominos();
-        paintGrid();
+
+        handler = new Handler();
+        handler.postDelayed(runnable, SPEED);
+    }
+
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            paintBackground();
+            paintTetrominos();
+            paintGrid();
+            handler.postDelayed(this, SPEED);
+        }
+    };
+
+    public void paintBackground() {
+        paint.setColor(Color.parseColor(GameActivity.COLOR_GRID_BACKGROUND));
+        canvas.drawRect(0,0, BOARD_WIDTH, BOARD_HEIGHT, paint);
     }
 
     public void paintGrid() {
@@ -78,7 +93,7 @@ public class GameActivity extends Activity {
             float yX = j * (BOARD_WIDTH / GameActivity.NUM_COLUMNS);
             canvas.drawLine(yX,0, yX, BOARD_HEIGHT, paint);
         }
-
+        linearLayout.setBackground(new BitmapDrawable(getApplicationContext().getResources(), bitmap));
     }
 
     public void paintTetrominos() {
@@ -91,4 +106,6 @@ public class GameActivity extends Activity {
             }
         }
     }
+
+
 }
