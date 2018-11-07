@@ -27,10 +27,11 @@ public class GameActivity extends Activity {
     private static final int BOARD_WIDTH = 280;
     private static final float CELL_WIDTH = BOARD_WIDTH/NUM_COLUMNS;
     private static final float CELL_HEIGHT = BOARD_HEIGHT/NUM_ROWS;
-    private static final int SPEED = 600;
+    private static final int SPEED = 400;
 
     private List<Tetromino> tetrominos;
 
+    Random random = new Random();
     Handler handler;
     Bitmap bitmap;
     Canvas canvas;
@@ -49,20 +50,10 @@ public class GameActivity extends Activity {
         canvas = new Canvas(bitmap);
         paint = new Paint();
         linearLayout.bringToFront();
-
         tetrominos = new ArrayList<Tetromino>(){};
-        TetrominoI tI = new TetrominoI();
-        TetrominoJ tJ = new TetrominoJ();
-        TetrominoL tL = new TetrominoL();
-        TetrominoO tO = new TetrominoO();
-        TetrominoS tS = new TetrominoS();
-        TetrominoT tT = new TetrominoT();
-        TetrominoZ tZ = new TetrominoZ();
-
-        tI.setStartPosition(NUM_COLUMNS, NUM_ROWS);
-        tetrominos.add(tI);
-
-
+        Tetromino item = getRandomTetromino(random.nextInt(6));
+        item.setStartPosition(NUM_COLUMNS, NUM_ROWS);
+        tetrominos.add(item);
         handler = new Handler();
         handler.postDelayed(runnable, SPEED);
     }
@@ -73,9 +64,41 @@ public class GameActivity extends Activity {
             paintBackground();
             paintTetrominos();
             paintGrid();
+            int i = 0;
+            int size = tetrominos.size();
+            for (Tetromino tetro : tetrominos) {
+                i++;
+                boolean fall = true;
+                for (Pos pos : tetro.getPos()) {
+                    if (isPositionOccupied(i-1,pos.getX() + 1, pos.getY())) {
+                        fall = false;
+                    }
+                }
+                if (fall) {
+                    tetro.fall();
+                } else if (i == size) {
+                    Tetromino item = getRandomTetromino(random.nextInt(6));
+                    item.setStartPosition(NUM_COLUMNS, NUM_ROWS);
+                    tetrominos.add(item);
+                }
+            }
             handler.postDelayed(this, SPEED);
         }
     };
+
+    private Tetromino getRandomTetromino(int number) {
+        Tetromino newItem;
+        switch (number) {
+            case 0: newItem = new TetrominoO(); break;
+            case 1: newItem = new TetrominoI(); break;
+            case 2: newItem = new TetrominoJ(); break;
+            case 3: newItem = new TetrominoL(); break;
+            case 4: newItem = new TetrominoZ(); break;
+            case 5: newItem = new TetrominoT(); break;
+            default: newItem = new TetrominoS(); break;
+        }
+        return newItem;
+    }
 
     public void paintBackground() {
         paint.setColor(Color.parseColor(GameActivity.COLOR_GRID_BACKGROUND));
@@ -107,5 +130,19 @@ public class GameActivity extends Activity {
         }
     }
 
+    private boolean isPositionOccupied(int index, int x, int y) {
+        if (x >= NUM_ROWS || y >= NUM_COLUMNS || y < 0) return true;
+        int i = 0;
+        for (Tetromino tetromino : tetrominos) {
+            if (i == index) continue;
+            for (Pos pos : tetromino.getPos()) {
+                if (pos.getX() == x && pos.getY() == y) {
+                    return true;
+                }
+            }
+            i++;
+        }
+        return false;
+    }
 
 }
