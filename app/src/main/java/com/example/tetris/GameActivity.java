@@ -7,24 +7,25 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.shapes.Shape;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.widget.LinearLayout;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class GameActivity extends Activity {
+public class GameActivity extends Activity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
     private static final String COLOR_GRID_BACKGROUND = "#7987A5";
     private static final String COLOR_GRID_LINES = "#90BBE6";
     private static final int NUM_ROWS = 20;
     private static final int NUM_COLUMNS = 10;
     private static final int BOARD_HEIGHT = 480;
-    private static final int BOARD_WIDTH = 280;
+    private static final int BOARD_WIDTH = 240;
     private static final float CELL_WIDTH = BOARD_WIDTH/NUM_COLUMNS;
     private static final float CELL_HEIGHT = BOARD_HEIGHT/NUM_ROWS;
     private static final int SPEED = 400;
@@ -37,25 +38,31 @@ public class GameActivity extends Activity {
     Canvas canvas;
     Paint paint;
     LinearLayout linearLayout;
+    private GestureDetector gestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        gestureDetector = new GestureDetector(this, this);
+        gestureDetector.setOnDoubleTapListener(this);
         linearLayout = findViewById(R.id.game_board);
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
         bitmap = Bitmap.createBitmap(BOARD_WIDTH, BOARD_HEIGHT, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         paint = new Paint();
         linearLayout.bringToFront();
         tetrominos = new ArrayList<Tetromino>(){};
-        Tetromino item = getRandomTetromino(random.nextInt(6));
+        Tetromino item = getRandomTetromino(random.nextInt(7));
         item.setStartPosition(NUM_COLUMNS, NUM_ROWS);
         tetrominos.add(item);
         handler = new Handler();
         handler.postDelayed(runnable, SPEED);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        gestureDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 
     private Runnable runnable = new Runnable() {
@@ -77,7 +84,7 @@ public class GameActivity extends Activity {
                 if (fall) {
                     tetro.fall();
                 } else if (i == size) {
-                    Tetromino item = getRandomTetromino(random.nextInt(6));
+                    Tetromino item = getRandomTetromino(random.nextInt(7));
                     item.setStartPosition(NUM_COLUMNS, NUM_ROWS);
                     tetrominos.add(item);
                 }
@@ -145,4 +152,81 @@ public class GameActivity extends Activity {
         return false;
     }
 
+    @Override
+    public boolean onDown(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int lastIndex = tetrominos.size() - 1;
+        if (e.getY() < size.y/2) {
+            if (e.getX() < size.x / 2) {
+                Log.d("slide left", "left");
+                if (tetrominos.get(lastIndex).isLeftFree()) {
+                    tetrominos.get(lastIndex).slideLeft();
+                }
+            } else {
+                Log.d("slide right", "right");
+                if (tetrominos.get(lastIndex).isRightFree(NUM_COLUMNS)) {
+                    tetrominos.get(lastIndex).slideRight();
+                }
+            }
+        } else {
+            if (e.getX() < size.x / 2) {
+                Log.d("move left", "left");
+                if (tetrominos.get(lastIndex).isLeftFree()) {
+                    tetrominos.get(lastIndex).moveLeft();
+                }
+            } else {
+                Log.d("move right", "right");
+                if (tetrominos.get(lastIndex).isRightFree(NUM_COLUMNS)) {
+                    tetrominos.get(lastIndex).moveRight();
+                }
+            }
+        }
+        paintBackground();
+        paintTetrominos();
+        paintGrid();
+        return true;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+
+        return false;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e) {
+        return false;
+    }
 }
