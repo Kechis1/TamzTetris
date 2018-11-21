@@ -14,12 +14,17 @@ import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
-public class GameActivity extends Activity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+public class GameActivity extends Activity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, View.OnClickListener {
     private static final String COLOR_GRID_BACKGROUND = "#7987A5";
     private static final String COLOR_GRID_LINES = "#90BBE6";
     private static final int NUM_ROWS = 20;
@@ -28,10 +33,11 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
     private static final int BOARD_WIDTH = 240;
     private static final float CELL_WIDTH = BOARD_WIDTH/NUM_COLUMNS;
     private static final float CELL_HEIGHT = BOARD_HEIGHT/NUM_ROWS;
-    private static final int SPEED = 400;
+    private static final int SPEED = 300;
 
     private List<Tetromino> tetrominos;
 
+    private boolean gamePaused = false;
     Random random = new Random();
     Handler handler;
     Bitmap bitmap;
@@ -39,6 +45,7 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
     Paint paint;
     LinearLayout linearLayout;
     private GestureDetector gestureDetector;
+    Button BTPause;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +54,14 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
         gestureDetector = new GestureDetector(this, this);
         gestureDetector.setOnDoubleTapListener(this);
         linearLayout = findViewById(R.id.game_board);
+        BTPause = findViewById(R.id.BTPause);
+        BTPause.setOnClickListener(this);
         bitmap = Bitmap.createBitmap(BOARD_WIDTH, BOARD_HEIGHT, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
         paint = new Paint();
         linearLayout.bringToFront();
+        paintBackground();
+        paintGrid();
         tetrominos = new ArrayList<Tetromino>(){};
         Tetromino item = getRandomTetromino(random.nextInt(7));
         item.setStartPosition(NUM_COLUMNS, NUM_ROWS);
@@ -60,14 +71,46 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
     }
 
     @Override
+    public void onClick(View v) {
+        gamePaused = !gamePaused;
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         gestureDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
 
+    private List<Integer> getFullRows() {
+        List<Integer> rows = new ArrayList<>();
+        List<Integer> map = new ArrayList<Integer>(NUM_ROWS) {};
+        for (int i = 0; i < NUM_ROWS; i++) {
+            map.add(i, 0);
+        }
+        int j = 0;
+        for (Tetromino tetro : tetrominos) {
+            Log.d("row", " tetro " + (j++));
+            for (Pos pos : tetro.getPos()) {
+                int index = pos.getX();
+                map.set(index, map.get(index)+1);
+                Log.d("row", " index: " + index);
+                if (map.get(index) == NUM_COLUMNS) {
+                    Log.d("row", " full " + index + ", " + map.get(index));
+                    rows.add(index);
+                }
+            }
+            Log.d("row", " -------------- ");
+        }
+        return rows;
+    }
+
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
+            if (gamePaused) {
+                handler.postDelayed(this, SPEED);
+                return;
+            }
             paintBackground();
             paintTetrominos();
             paintGrid();
@@ -76,14 +119,25 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
             for (Tetromino tetro : tetrominos) {
                 i++;
                 boolean fall = true;
-                for (Pos pos : tetro.getPos()) {
-                    if (isPositionOccupied(i-1,pos.getX() + 1, pos.getY())) {
-                        fall = false;
-                    }
+                if (Tetromino.isPositionOccupied(i-1, NUM_ROWS, NUM_COLUMNS, 1, 0, tetro.getPos(), tetrominos)) {
+                    fall = false;
                 }
                 if (fall) {
                     tetro.fall();
                 } else if (i == size) {
+                    List<Integer> fullRows = getFullRows();
+                    if (fullRows.size() > 0) {
+                        for (Tetromino tet : tetrominos) {
+                            for (int a : fullRows) {
+                                for (int h = 0; h < tet.getPos().size(); h++) {
+                                    if (tet.getPos().get(h).getX() == a) {
+                                        tet.getPos().remove(h);
+                                        h = -1;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     Tetromino item = getRandomTetromino(random.nextInt(7));
                     item.setStartPosition(NUM_COLUMNS, NUM_ROWS);
                     tetrominos.add(item);
@@ -137,21 +191,6 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
         }
     }
 
-    private boolean isPositionOccupied(int index, int x, int y) {
-        if (x >= NUM_ROWS || y >= NUM_COLUMNS || y < 0) return true;
-        int i = 0;
-        for (Tetromino tetromino : tetrominos) {
-            if (i == index) continue;
-            for (Pos pos : tetromino.getPos()) {
-                if (pos.getX() == x && pos.getY() == y) {
-                    return true;
-                }
-            }
-            i++;
-        }
-        return false;
-    }
-
     @Override
     public boolean onDown(MotionEvent e) {
         return false;
@@ -164,31 +203,48 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
 
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
+        if (gamePaused) {
+            return false;
+        }
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         int lastIndex = tetrominos.size() - 1;
         if (e.getY() < size.y/2) {
             if (e.getX() < size.x / 2) {
-                Log.d("slide left", "left");
-                if (tetrominos.get(lastIndex).isLeftFree()) {
+                boolean slideLeft = true;
+                List<Pos> positions = tetrominos.get(lastIndex).getSlideLeftPos();
+                if (Tetromino.isPositionOccupied(lastIndex, NUM_ROWS, NUM_COLUMNS, 0, 0, positions, tetrominos)) {
+                    slideLeft = false;
+                }
+                if (slideLeft) {
                     tetrominos.get(lastIndex).slideLeft();
                 }
             } else {
-                Log.d("slide right", "right");
-                if (tetrominos.get(lastIndex).isRightFree(NUM_COLUMNS)) {
+                boolean slideRight = true;
+                List<Pos> positions = tetrominos.get(lastIndex).getSlideRightPos();
+                if (Tetromino.isPositionOccupied(lastIndex, NUM_ROWS, NUM_COLUMNS, 0, 0, positions, tetrominos)) {
+                    slideRight = false;
+                }
+                if (slideRight) {
                     tetrominos.get(lastIndex).slideRight();
                 }
             }
         } else {
             if (e.getX() < size.x / 2) {
-                Log.d("move left", "left");
-                if (tetrominos.get(lastIndex).isLeftFree()) {
+                boolean moveLeft = true;
+                if (Tetromino.isPositionOccupied(lastIndex, NUM_ROWS, NUM_COLUMNS,0, -1, tetrominos.get(lastIndex).getPos(), tetrominos)) {
+                    moveLeft = false;
+                }
+                if (moveLeft) {
                     tetrominos.get(lastIndex).moveLeft();
                 }
             } else {
-                Log.d("move right", "right");
-                if (tetrominos.get(lastIndex).isRightFree(NUM_COLUMNS)) {
+                boolean moveRight = true;
+                if (Tetromino.isPositionOccupied(lastIndex, NUM_ROWS, NUM_COLUMNS, 0, 1, tetrominos.get(lastIndex).getPos(), tetrominos)) {
+                    moveRight = false;
+                }
+                if (moveRight) {
                     tetrominos.get(lastIndex).moveRight();
                 }
             }

@@ -13,6 +13,16 @@ public class TetrominoO extends Tetromino {
     }
 
     @Override
+    public List<Pos> getSlideLeftPos() {
+        return new ArrayList<Pos>() {};
+    }
+
+    @Override
+    public List<Pos> getSlideRightPos() {
+        return new ArrayList<Pos>() {};
+    }
+
+    @Override
     public void slideRight() {
 
     }

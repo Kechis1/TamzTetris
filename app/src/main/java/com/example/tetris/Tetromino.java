@@ -19,6 +19,25 @@ public abstract class Tetromino {
         this.position = position;
     }
 
+    public static boolean isPositionOccupied(int index, int numRows, int numColumns, int xChange, int yChange, List<Pos> positions, List<Tetromino> tetrominos) {
+        for (Pos posChange : positions) {
+            if (posChange.getX() + xChange >= numRows || posChange.getY() + yChange >= numColumns || posChange.getY() + yChange < 0) return true;
+        }
+        int i = 0;
+        for (Tetromino tetromino : tetrominos) {
+            if (i == index) continue;
+            for (Pos pos : tetromino.getPos()) {
+                for (Pos posChange : positions) {
+                    if (pos.getX() == posChange.getX() + xChange && pos.getY() == posChange.getY() + yChange) {
+                        return true;
+                    }
+                }
+            }
+            i++;
+        }
+        return false;
+    }
+
     public List<Pos> getPos() {
         return pos;
     }
@@ -53,24 +72,8 @@ public abstract class Tetromino {
         }
     }
 
-    public boolean isRightFree(int numColumns) {
-        for (Pos position : pos) {
-            if (position.getY() == numColumns-1) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean isLeftFree() {
-        for (Pos position : pos) {
-            if (position.getY() == 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+    public abstract List<Pos> getSlideLeftPos();
+    public abstract List<Pos> getSlideRightPos();
     public abstract void slideRight();
     public abstract void slideLeft();
     public abstract void setStartPosition(int numColumns, int numRows);
