@@ -6,4 +6,5 @@
     <color name="colorTextOrange">#e1675b</color>
     <color name="colorTextBlue">#56DCD7</color>
     <color name="colorTextGrey">#6E6D6F</color>
+    <color name="colorRed">#ff0000</color>
 </resources>
