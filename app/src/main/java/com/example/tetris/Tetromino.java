@@ -6,9 +6,11 @@ public abstract class Tetromino {
     protected List<Pos> pos;
     protected int position = 0;
     protected int color;
+    protected int borderColor;
 
-    public Tetromino(int color) {
+    public Tetromino(int color, int borderColor) {
         this.color = color;
+        this.borderColor = borderColor;
     }
 
     public int getPosition() {
@@ -48,6 +50,10 @@ public abstract class Tetromino {
 
     public int getColor() {
         return color;
+    }
+
+    public int getBorderColor() {
+        return borderColor;
     }
 
     public void setColor(int color) {

@@ -6,10 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TetrominoO extends Tetromino {
-    private static final int COLOR = Color.YELLOW;
+    private static final int COLOR = Color.parseColor("#f8fd75");
+    private static final int BORDER_COLOR = Color.parseColor("#fdcb75");
 
     public TetrominoO() {
-        super(COLOR);
+        super(COLOR, BORDER_COLOR);
     }
 
     @Override

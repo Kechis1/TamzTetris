@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -23,23 +24,28 @@ import java.util.Random;
 
 
 /**
- * @TODO moznost rychle dolu
  * @TODO graficke oznaceni kde je doleva/doprava/slide left/slide right
- * @TODO next (generovani a graficke oznaceni)
  * @TODO databaze skore
  * @TODO .. ?
  */
 public class GameActivity extends Activity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, View.OnClickListener {
     private static final String COLOR_GRID_BACKGROUND = "#7987A5";
     private static final String COLOR_GRID_LINES = "#90BBE6";
+    private static final String COLOR_BACKGROUND_NEXT = "#CBE0FC";
     private static final int NUM_ROWS = 20;
     private static final int NUM_COLUMNS = 10;
+    private static final int NUM_ROWS_NEXT = 24;
+    private static final int NUM_COLUMNS_NEXT = 8;
     private static final int BOARD_HEIGHT = 480;
     private static final int BOARD_WIDTH = 240;
+    private static final int BOARD_HEIGHT_NEXT = 240;
+    private static final int BOARD_WIDTH_NEXT = 80;
     private static final float CELL_WIDTH = BOARD_WIDTH/NUM_COLUMNS;
     private static final float CELL_HEIGHT = BOARD_HEIGHT/NUM_ROWS;
-    private static final int SPEED = 800;
-    private static final int MAX_SPEED = 200;
+    private static final float CELL_WIDTH_NEXT = BOARD_WIDTH_NEXT/NUM_COLUMNS_NEXT;
+    private static final float CELL_HEIGHT_NEXT = BOARD_HEIGHT_NEXT/NUM_ROWS_NEXT;
+    private static final int SPEED_START = 800;
+    private static final int SPEED_MAX = 200;
     private static final int SPEED_STEP = 30;
     private static final int LEVEL_UP = 10;
 
@@ -48,13 +54,15 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
     private int level, score, linesCleared, currentSpeed;
     private TextView TVGameOver, TVGameOverPlay, TVScore, TVLevel;
     private boolean gamePaused, gameOver = false;
+    private List<Tetromino> stack;
 
-    Random random = new Random();
-    Handler handler;
-    Bitmap bitmap;
-    Canvas canvas;
+    private Random random = new Random();
+    private Handler handler;
+    private Bitmap bitmap, bitmapNext;
+    private Canvas canvas, canvasNext;
     Paint paint;
     LinearLayout linearLayout;
+    private ConstraintLayout CLNext;
     private GestureDetector gestureDetector;
     Button BTPause;
 
@@ -78,15 +86,19 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
         TVGameOverPlay = findViewById(R.id.TVGameOverPlay);
         TVGameOverPlay.bringToFront();
         TVGameOverPlay.setOnClickListener(this);
+        CLNext = findViewById(R.id.CLNext);
+        bitmapNext = Bitmap.createBitmap(BOARD_WIDTH_NEXT, BOARD_HEIGHT_NEXT, Bitmap.Config.ARGB_8888);
+        canvasNext = new Canvas(bitmapNext);
         gameInit();
         handler = new Handler();
-        handler.postDelayed(runnable, SPEED);
+        handler.postDelayed(runnable, SPEED_START);
     }
 
     private void gameInit() {
         paintBackground();
+        paintBackgroundNext();
         paintGrid();
-        currentSpeed = SPEED;
+        currentSpeed = SPEED_START;
         gameOver = false;
         gamePaused = false;
         score = level = linesCleared = 0;
@@ -97,6 +109,12 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
         tetrominos = new ArrayList<Tetromino>(){};
         Tetromino item = getRandomTetromino(random.nextInt(7));
         item.setStartPosition(NUM_COLUMNS, NUM_ROWS);
+        stack = new ArrayList<Tetromino>(){};
+        stack.add(getRandomTetromino(random.nextInt(7)));
+        stack.add(getRandomTetromino(random.nextInt(7)));
+        stack.add(getRandomTetromino(random.nextInt(7)));
+        stack.add(getRandomTetromino(random.nextInt(7)));
+        paintTetrominoNext();
        // generateTetrominos();
         tetrominos.add(item);
     }
@@ -164,8 +182,8 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
                 return;
             }
             paintBackground();
-            paintTetrominos();
             paintGrid();
+            paintTetrominos();
             int i = 0;
             int size = tetrominos.size();
             for (Tetromino tetro : tetrominos) {
@@ -197,12 +215,12 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
                             linesCleared -= LEVEL_UP;
                             level += 1;
                             TVLevel.setText(getString(R.string.level, level));
-                            if (currentSpeed > MAX_SPEED) {
+                            if (currentSpeed > SPEED_MAX) {
                                 currentSpeed -= SPEED_STEP;
                             }
                         }
                     }
-                    Tetromino item = getRandomTetromino(random.nextInt(7));
+                    Tetromino item = stack.get(0);
                     item.setStartPosition(NUM_COLUMNS, NUM_ROWS);
                     tetrominos.add(item);
                     if (Tetromino.isPositionOccupied(tetrominos.size()-1, NUM_ROWS, NUM_COLUMNS, 1, 0, item.getPos(), tetrominos)) {
@@ -210,6 +228,10 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
                         TVGameOver.setVisibility(View.VISIBLE);
                         TVGameOverPlay.setVisibility(View.VISIBLE);
                     }
+                    stack.remove(0);
+                    stack.add(getRandomTetromino(random.nextInt(7)));
+                    paintBackgroundNext();
+                    paintTetrominoNext();
                 }
             }
             handler.postDelayed(this, currentSpeed);
@@ -299,6 +321,38 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
         canvas.drawRect(0,0, BOARD_WIDTH, BOARD_HEIGHT, paint);
     }
 
+    public void paintBackgroundNext() {
+        paint.setColor(Color.parseColor(GameActivity.COLOR_BACKGROUND_NEXT));
+        canvasNext.drawRect(0,0, BOARD_WIDTH_NEXT, BOARD_HEIGHT_NEXT, paint);
+    }
+
+    public void paintTetrominoNext() {
+        for (int i = 0; i < stack.size(); i++) {
+            paint.setColor(stack.get(i).getColor());
+            stack.get(i).setStartPosition(NUM_COLUMNS_NEXT, NUM_ROWS_NEXT);
+            for (Pos pos : stack.get(i).getPos()) {
+                float left = pos.getY() * CELL_WIDTH_NEXT;
+                float top = (float) (pos.getX() * CELL_HEIGHT_NEXT + (i+1) * 4.5 * CELL_HEIGHT_NEXT);
+                canvasNext.drawRect(left, top, left + CELL_WIDTH_NEXT, top + CELL_HEIGHT_NEXT, paint);
+            }
+        }
+
+        paint.setStrokeWidth(1);
+        for (int i = 0; i < stack.size(); i++) {
+            paint.setColor(stack.get(i).getBorderColor());
+            for (Pos pos : stack.get(i).getPos()) {
+                float left = pos.getY() * CELL_WIDTH_NEXT;
+                float top = (float) (pos.getX() * CELL_HEIGHT_NEXT + (i+1) * 4.5 * CELL_HEIGHT_NEXT);
+                canvasNext.drawLine(left, top,left + CELL_WIDTH_NEXT, top, paint);
+                canvasNext.drawLine(left, top, left, top + CELL_HEIGHT_NEXT, paint);
+                canvasNext.drawLine(left,top + CELL_HEIGHT_NEXT,left + CELL_WIDTH_NEXT, top + CELL_HEIGHT_NEXT, paint);
+                canvasNext.drawLine(left + CELL_WIDTH_NEXT, top, left + CELL_WIDTH_NEXT, top + CELL_HEIGHT_NEXT, paint);
+            }
+        }
+
+        CLNext.setBackground(new BitmapDrawable(getApplicationContext().getResources(), bitmapNext));
+    }
+
     public void paintGrid() {
         paint.setStrokeWidth(1);
         paint.setColor(Color.parseColor(GameActivity.COLOR_GRID_LINES));
@@ -320,6 +374,19 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
                 float left = pos.getY() * CELL_WIDTH;
                 float top = pos.getX() * CELL_HEIGHT;
                 canvas.drawRect(left, top, left + CELL_WIDTH, top + CELL_HEIGHT, paint);
+            }
+        }
+
+        paint.setStrokeWidth(1.5f);
+        for (int i = 0; i < tetrominos.size(); i++) {
+            paint.setColor(tetrominos.get(i).getBorderColor());
+            for (Pos pos : tetrominos.get(i).getPos()) {
+                float left = pos.getY() * CELL_WIDTH;
+                float top = pos.getX() * CELL_HEIGHT;
+                canvas.drawLine(left, top,left + CELL_WIDTH, top, paint);
+                canvas.drawLine(left, top, left, top + CELL_HEIGHT, paint);
+                canvas.drawLine(left,top + CELL_HEIGHT,left + CELL_WIDTH, top + CELL_HEIGHT, paint);
+                canvas.drawLine(left + CELL_WIDTH, top, left + CELL_WIDTH, top + CELL_HEIGHT, paint);
             }
         }
     }
@@ -387,8 +454,8 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
             }
         }
         paintBackground();
-        paintTetrominos();
         paintGrid();
+        paintTetrominos();
         return true;
     }
 

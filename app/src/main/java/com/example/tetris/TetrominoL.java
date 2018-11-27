@@ -7,9 +7,10 @@ import java.util.List;
 
 public class TetrominoL extends Tetromino {
     private static final int COLOR = Color.parseColor("#FFA500");
+    private static final int BORDER_COLOR = Color.parseColor("#b58328");
 
     public TetrominoL() {
-        super(COLOR);
+        super(COLOR, BORDER_COLOR);
     }
 
     @Override
