@@ -24,9 +24,11 @@ import java.util.Random;
 
 
 /**
- * @TODO graficke oznaceni kde je doleva/doprava/slide left/slide right
- * @TODO databaze skore
- * @TODO .. ?
+ * Required Features - Gestures, Thread, Database, Audio, Canvas, Login in to facebook -> Download data from facebook (image, name)
+ * @TODO Login in to facebook
+ * @TODO database
+ * @TODO settings (speed, name)
+ * @TODO TOP scores (rankings, table)
  */
 public class GameActivity extends Activity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, View.OnClickListener {
     private static final String COLOR_GRID_BACKGROUND = "#7987A5";
@@ -124,6 +126,11 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
         switch (v.getId()) {
             case R.id.BTPause:
                 gamePaused = !gamePaused;
+                if (!gamePaused) {
+                    BTPause.setText(getString(R.string.icon_pause));
+                } else {
+                    BTPause.setText(getString(R.string.icon_play));
+                }
                 break;
             case R.id.TVGameOverPlay:
                 gameInit();

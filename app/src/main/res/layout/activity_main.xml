@@ -53,7 +53,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="4dp"
         android:fontFamily="@font/fontawesome"
-        android:text="@string/icon_volume_up"
+        android:text="@string/icon_volume_mute"
         android:textColor="@color/colorTextGrey"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
