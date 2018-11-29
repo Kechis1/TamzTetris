@@ -1,33 +1,47 @@
 package com.example.tetris;
 
 import android.app.Activity;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+
 import android.os.Bundle;
 import android.os.Handler;
+
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+
 import android.util.Log;
-import android.view.Display;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import android.view.Display;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+
 
 /**
  * Required Features - Gestures, Thread, Database, Audio, Canvas, Login in to facebook -> Download data from facebook (image, name)
+ * @TODO settings (speed, name)
  * @TODO Login in to facebook
  * @TODO database
- * @TODO settings (speed, name)
  * @TODO TOP scores (rankings, table)
  */
 public class GameActivity extends Activity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener, View.OnClickListener {
@@ -67,11 +81,13 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
     private ConstraintLayout CLNext;
     private GestureDetector gestureDetector;
     Button BTPause;
+    private FirebaseFirestore database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        database = FirebaseFirestore.getInstance();
         gestureDetector = new GestureDetector(this, this);
         gestureDetector.setOnDoubleTapListener(this);
         linearLayout = findViewById(R.id.game_board);

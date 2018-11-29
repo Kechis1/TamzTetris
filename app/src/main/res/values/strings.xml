@@ -10,6 +10,7 @@
     <string name="level">LEVEL: %1$d</string>
     <string name="icon_pause">&#xf04c;</string>
     <string name="icon_play">&#xf04b;</string>
+    <string name="settings">Settings</string>
     <string name="next">NEXT</string>
     <string name="game_over">Game Over</string>
     <string name="game_over_play">Tap to play again</string>
