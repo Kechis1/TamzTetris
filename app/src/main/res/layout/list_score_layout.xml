@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tvUerName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:text="@string/player"
+        android:textAlignment="center"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/tvLevel"
+        android:layout_width="135dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="@string/list_level"
+        android:textAlignment="center"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/tvScore"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="@string/list_score"
+        android:textAlignment="center"
+        android:textColor="@android:color/black" />
+
+</LinearLayout>

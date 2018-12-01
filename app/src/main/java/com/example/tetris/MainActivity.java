@@ -1,7 +1,6 @@
 package com.example.tetris;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
@@ -11,7 +10,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +40,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bensound_buddy);
         mediaPlayer.setLooping(true);
-        mediaPlayer.start();
+        //mediaPlayer.start();
 
         mySharedPref = PreferenceManager.getDefaultSharedPreferences(this);
     }
@@ -98,7 +96,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 startActivityForResult(intentSettings, 333);
                 break;
             case R.id.tvMedal:
-
+                startActivity(new Intent(this, HighScoreActivity.class), null);
                 break;
         }
     }
