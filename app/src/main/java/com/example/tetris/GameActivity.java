@@ -2,6 +2,7 @@ package com.example.tetris;
 
 import android.app.Activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -48,27 +49,35 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
     private static final String COLOR_GRID_BACKGROUND = "#7987A5";
     private static final String COLOR_GRID_LINES = "#90BBE6";
     private static final String COLOR_BACKGROUND_NEXT = "#CBE0FC";
+
     private static final int NUM_ROWS = 20;
     private static final int NUM_COLUMNS = 10;
     private static final int NUM_ROWS_NEXT = 24;
     private static final int NUM_COLUMNS_NEXT = 8;
+
     private static final int BOARD_HEIGHT = 480;
     private static final int BOARD_WIDTH = 240;
     private static final int BOARD_HEIGHT_NEXT = 240;
     private static final int BOARD_WIDTH_NEXT = 80;
+
     private static final float CELL_WIDTH = BOARD_WIDTH/NUM_COLUMNS;
     private static final float CELL_HEIGHT = BOARD_HEIGHT/NUM_ROWS;
     private static final float CELL_WIDTH_NEXT = BOARD_WIDTH_NEXT/NUM_COLUMNS_NEXT;
     private static final float CELL_HEIGHT_NEXT = BOARD_HEIGHT_NEXT/NUM_ROWS_NEXT;
-    private static final int SPEED_START = 800;
+
+    public static final int SPEED_START = 800;
     private static final int SPEED_MAX = 200;
     private static final int SPEED_STEP = 30;
+
     private static final int LEVEL_UP = 10;
+    public static final int LEVEL_EASY = 0;
+    public static final int LEVEL_MEDIUM = 5;
+    public static final int LEVEL_HARD = 10;
 
     private List<Tetromino> tetrominos;
 
     private int level, score, linesCleared, currentSpeed;
-    private TextView TVGameOver, TVGameOverPlay, TVScore, TVLevel;
+    private TextView TVGameOver, TVGameOverPlay, TVScore, TVLevel, TVPlayer;
     private boolean gamePaused, gameOver = false;
     private List<Tetromino> stack;
 
@@ -104,6 +113,7 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
         TVGameOverPlay = findViewById(R.id.TVGameOverPlay);
         TVGameOverPlay.bringToFront();
         TVGameOverPlay.setOnClickListener(this);
+        TVPlayer = findViewById(R.id.TVPlayer);
         CLNext = findViewById(R.id.CLNext);
         bitmapNext = Bitmap.createBitmap(BOARD_WIDTH_NEXT, BOARD_HEIGHT_NEXT, Bitmap.Config.ARGB_8888);
         canvasNext = new Canvas(bitmapNext);
@@ -112,14 +122,21 @@ public class GameActivity extends Activity implements GestureDetector.OnGestureL
         handler.postDelayed(runnable, SPEED_START);
     }
 
+    public static int calculateSpeedByLevel(int level) {
+        return SPEED_START - level * SPEED_STEP;
+    }
+
     private void gameInit() {
         paintBackground();
         paintBackgroundNext();
         paintGrid();
-        currentSpeed = SPEED_START;
+        score = level = linesCleared = 0;
+        Intent intent = getIntent();
+        TVPlayer.setText(intent.getStringExtra(SettingsActivity.PLAYER_NAME));
+        currentSpeed = intent.getIntExtra(SettingsActivity.SPEED, SPEED_START);
+        level = intent.getIntExtra(SettingsActivity.LEVEL, level);
         gameOver = false;
         gamePaused = false;
-        score = level = linesCleared = 0;
         TVGameOver.setVisibility(View.GONE);
         TVGameOverPlay.setVisibility(View.GONE);
         TVScore.setText(getString(R.string.score, score));

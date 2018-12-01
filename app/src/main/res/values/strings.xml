@@ -14,4 +14,10 @@
     <string name="next">NEXT</string>
     <string name="game_over">Game Over</string>
     <string name="game_over_play">Tap to play again</string>
+    <string name="nick_name">Name</string>
+    <string name="easy">Easy</string>
+    <string name="medium">Medium</string>
+    <string name="hard">Hard</string>
+    <string name="save">Save</string>
+    <string name="player">Player</string>
 </resources>
